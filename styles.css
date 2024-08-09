@@ -35,6 +35,22 @@ a {
     padding: 20px 0;
 }
 
+.goal-custom {
+    border-bottom: 0;
+}
+
+.section {
+    padding: 0 0;
+}
+
+.section p {
+    margin-top: -20px;
+}
+
+.text {
+    padding: 0 0;
+}
+
 .goal img {
     width: 64px;
     height: 64px;

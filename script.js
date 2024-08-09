@@ -1,23 +1,41 @@
-document.getElementById('search-button').addEventListener('click', function() {
+function searchButtonListener() {
     let searchTerm = document.getElementById('search-input').value;
     if (searchTerm) {
         window.location.href = `?u=${encodeURIComponent(searchTerm)}`;
     } else {
         window.location.href = `?u=${encodeURIComponent("*all")}`;
     }
-});
+};
 
 function getParam(param) {
     let urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+function mainGuideDisplay() {
+    addSection("Come funziona?", "Questo sito è stato progettato per permettere alle persone di condividere degli \"obiettivi\" e sfidarsi per completarne altri.");
+    addSection("Cosa sono gli obiettivi?", "Un obiettivo è caratterizzato da una rarità (Maledizione, Iniziale, Comune, Raro, Epico, Leggendario e Speciale) e un requisito, che va completato per ottenerlo. Il nome e l'icona sono solamente decorativi e non vanno considerati nel suo completamento.");
+    addSection("Tipi di obiettivi", "Ci sono 3 tipi di obiettivi: normale, in serie e aggiuntivi.");
+    addSection("Gli obiettivi normali", "Qualsiasi obiettivo che non abbia una + o un numero romano alla fine del nome è normale. Questo tipo non necessita di spiegazioni aggiuntive: si sblocca quando viene raggiunto.");
+    addCustomGoal("Esempio", "Salta 3 volte", "../img/placeholder.png", "common");
+    addSection("Gli obiettivi in serie", "Se un obiettivo ha un numero romano alla fine del nome fa parte di una serie. Un obiettivo in serie funziona come uno normale, ad eccezione del fatto che un obiettivo con un numero più elevato sarà completabile solo quando quello precedente viene completato.");
+    addCustomGoal("Esempio I", "Salta 3 volte", "../img/placeholder.png", "common");
+    addCustomGoal("Esempio II", "Salta 5 volte", "../img/placeholder.png", "common");
+    addText("In questo caso, va prima completato Esempio I e poi si potrà completare Esempio II.")
+    addSection("Gli obiettivi aggiuntivi", "Se un obiettivo ha un + alla fine del nome è aggiuntivo. Un obiettivo aggiuntivo completerà automaticamente il suo obiettivo normale.");
+    addCustomGoal("Esempio", "Salta 3 volte", "../img/placeholder.png", "common");
+    addCustomGoal("Esempio+", "Salta 3 volte con una gamba sola", "../img/placeholder.png", "common");
+    addText("In questo caso, se viene completato Esempio+ verrà automaticamente completato anche Esempio.")
+    addSection("Come usiamo le tue informazioni", "Video: i video che mandi come prova verranno visti solamente dal proprietario del sito e successivamente archiviati nei server di Google. Leggi l'informativa sulla privacy di Google per saperne di più.")
+    
+}
+
+function mainGoalDisplay() {
     if (getParam("u") == null || getParam("u") == "") {
         window.location.href = `?u=${encodeURIComponent("*all")}`;
     }
     
-    all_goals = []
+    let all_goals = []
     for (const goal in goals) {
         if (goals[goal].rarity !== "special") {
             all_goals += goal
@@ -27,26 +45,33 @@ document.addEventListener("DOMContentLoaded", function() {
     if (getParam("u") in people) {
         document.getElementById("title").innerHTML = `Obiettivi:<br>${getParam("u")}`;
         for (let i = 0; i < people[getParam("u")].length; i++) {
-            const goal = people[getParam("u")][i]
-            addGoal(goal)
+            const goal = people[getParam("u")][i];
+            addGoal(goal);
+        }
+        addSection("Obiettivi speciali", "Qui ci sono degli obiettivi speciali che vengono aggiunti automaticamente.")
+        let specialGoalsPresent = false;
+        if (people[getParam("u")].includes("Bagnante") && people[getParam("u")].includes("Escursionista")) {
+            addGoal("Esploratore");
+            specialGoalsPresent = true;
         }
         if (people[getParam("u")] == all_goals) {
-            addSection("Obiettivi speciali", "Qui ci sono degli obiettivi speciali che vengono aggiunti automaticamente.")
-            addGoal("Veterano")
+            addGoal("Veterano");
+            specialGoalsPresent = true;
+        }
+        
+        if (!specialGoalsPresent) {
+            addText("Purtroppo non hai nessun obiettivo speciale.")
         }
     } else if (!(getParam("u") in people) && !(getParam("u") == "*all")) {
         document.getElementById("title").innerHTML = `Obiettivi:<br>${getParam("u")}`;
-        const goalsContainer = document.getElementById("goals-container");
-        const goalDiv = document.createElement("div");
-        goalDiv.innerHTML = "<p>Questa persona non si è ancora registrata.<p>";
-        goalsContainer.appendChild(goalDiv);
+        addText("Questa persona non si è ancora registrata.");
     } else {
         document.getElementById("title").innerHTML = `Tutti gli obiettivi`;
         for (const goal in goals) {
-            addGoal(goal)
+            addGoal(goal);
         }
     }
-});
+};
 
 function addGoal(goal) {
     const goalsContainer = document.getElementById("goals-container");
@@ -75,11 +100,41 @@ function addGoal(goal) {
 
     goalsContainer.appendChild(goalDiv);
 }
-function addSection(name, desc) {
+
+function addCustomGoal(name, desc, icon, rarity) {
     const goalsContainer = document.getElementById("goals-container");
     
     const goalDiv = document.createElement("div");
     goalDiv.classList.add("goal");
+    goalDiv.classList.add("goal-custom");
+
+    const goalImage = document.createElement("img");
+    goalImage.src = icon;
+    goalDiv.appendChild(goalImage);
+
+    const goalTitle = document.createElement("h2");
+    goalTitle.textContent = name;
+    goalDiv.appendChild(goalTitle);
+            
+    const goalRarity = document.createElement("p");
+    goalRarity.textContent = rarities[rarity];
+    goalRarity.classList.add("rarity")
+    goalRarity.classList.add(rarity)
+    goalDiv.appendChild(goalRarity);
+
+    const goalDescription = document.createElement("p");
+    goalDescription.textContent = desc;
+    goalDescription.classList.add("desc")
+    goalDiv.appendChild(goalDescription);
+
+    goalsContainer.appendChild(goalDiv);
+}
+
+function addSection(name, desc) {
+    const goalsContainer = document.getElementById("goals-container");
+    
+    const goalDiv = document.createElement("div");
+    goalDiv.classList.add("section");
 
     const goalTitle = document.createElement("h2");
     goalTitle.textContent = name;
@@ -87,6 +142,20 @@ function addSection(name, desc) {
     
     const goalDescription = document.createElement("p");
     goalDescription.textContent = desc;
+    goalDescription.classList.add("text")
+    goalDiv.appendChild(goalDescription);
+
+    goalsContainer.appendChild(goalDiv);
+}
+
+function addText(text) {
+    const goalsContainer = document.getElementById("goals-container");
+    
+    const goalDiv = document.createElement("div");
+    goalDiv.classList.add("text");
+    
+    const goalDescription = document.createElement("p");
+    goalDescription.textContent = text;
     goalDescription.classList.add("text")
     goalDiv.appendChild(goalDescription);
 
@@ -113,6 +182,11 @@ const goals = {
         "image": "aristocratico_2",
         "rarity": "rare",
     },
+    "Bagnante": {
+        "description": "Dormi al mare.",
+        "image": "bagnante",
+        "rarity": "rare",
+    },
     "Boykisser": {
         "description": "Vai in una convenzione furry.",
         "image": "boykisser",
@@ -137,6 +211,11 @@ const goals = {
         "description": "Prendi un richiamo di classe.",
         "image": "delinquenti",
         "rarity": "curse",
+    },
+    "Escursionista": {
+        "description": "Dormi in montagna.",
+        "image": "escursionista",
+        "rarity": "rare",
     },
     "Gli inseparabili I": {
         "description": "Fidanzati.",
@@ -214,6 +293,11 @@ const goals = {
         "rarity": "rare",
     },
     
+    "Esploratore": {
+        "description": "Ottieni gli obiettivi \"Bagnante\" ed \"Escursionista\".",
+        "image": "esploratore",
+        "rarity": "special",
+    },
     "Veterano": {
         "description": "Ottieni tutti gli obiettivi.",
         "image": "veterano",
@@ -230,8 +314,10 @@ const people = {
     "Studente II",
     ],
     "Andrea Graziani": [
+    "Bagnante",
     "Delinquente",
     "Delinquenti",
+    "Escursionista",
     "Gli inseparabili I",
     "Gli inseparabili II",
     "L'inizio",
@@ -241,9 +327,11 @@ const people = {
     "Studente III",
     ],
     "Gabriele Graziani": [
+    "Bagnante",
     "Debugger",
     "Delinquente",
     "Delinquenti",
+    "Escursionista",
     "L'inizio",
     "Oof I",
     "Pets",
@@ -252,6 +340,7 @@ const people = {
     "The Developer I",
     ],
     "Raffaele Morgillo": [
+    "Bagnante",
     "Delinquente",
     "Delinquenti",
     "L'inizio",
@@ -261,12 +350,12 @@ const people = {
     "Studente II",
     ],
     "Sofia Graziani": [
+    "Bagnante",
     "Delinquenti",
+    "Escursionista",
     "Gli inseparabili I",
     "L'inizio",
     "Oof I",
     "Pets",
     ]
 };
-
-let all_goals = []
