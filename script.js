@@ -37,7 +37,7 @@ function mainGoalDisplay() {
     
     let all_goals = []
     for (const goal in goals) {
-        if (goals[goal].rarity !== "special") {
+        if (goals[goal].rarity !== "special" && goals[goal].rarity !== "unique") {
             all_goals += goal
         }
     }
@@ -46,7 +46,9 @@ function mainGoalDisplay() {
         document.getElementById("title").innerHTML = `Obiettivi:<br>${getParam("u")}`;
         for (let i = 0; i < people[getParam("u")].length; i++) {
             const goal = people[getParam("u")][i];
-            addGoal(goal);
+            if (goals[goal].rarity !== "unique") {
+                addGoal(goal);
+            }
         }
         addSection("Obiettivi speciali", "Qui ci sono degli obiettivi speciali che vengono aggiunti automaticamente.")
         let specialGoalsPresent = false;
@@ -61,6 +63,20 @@ function mainGoalDisplay() {
         
         if (!specialGoalsPresent) {
             addText("Purtroppo non hai nessun obiettivo speciale.")
+        }
+        
+        addSection("Obiettivi unici", "Qui trovi gli obiettivi che ottieni dal creatore del sito in persona.")
+        let uniqueGoalsPresent = false;
+        for (let i = 0; i < people[getParam("u")].length; i++) {
+            const goal = people[getParam("u")][i];
+            if (goals[goal].rarity == "unique") {
+                addGoal(goal);
+                uniqueGoalsPresent = true;
+            }
+        }
+        
+        if (!uniqueGoalsPresent) {
+            addText("Purtroppo non hai nessun obiettivo unico.")
         }
     } else if (!(getParam("u") in people) && !(getParam("u") == "*all")) {
         document.getElementById("title").innerHTML = `Obiettivi:<br>${getParam("u")}`;
@@ -170,6 +186,7 @@ const rarities = {
     "epic": "Epico",
     "legendary": "Leggendario",
     "special": "Speciale",
+    "unique": "Unico",
 };
 const goals = {
     "Aristocratico I": {
@@ -303,6 +320,12 @@ const goals = {
         "image": "veterano",
         "rarity": "special",
     },
+    
+    "Sviluppatore": {
+        "description": "Contribuisci nella realizzazione di Spark.",
+        "image": "sviluppatore",
+        "rarity": "unique",
+    },
 };
     
 const people = {
@@ -338,6 +361,21 @@ const people = {
     "Studente I",
     "Studente II",
     "The Developer I",
+    
+    "Sviluppatore",
+    ],
+    "Maila Quaresima": [
+    "Aristocratico I",
+    "Bagnante",
+    "Delinquenti",
+    "Escursionista",
+    "Gli inseparabili I",
+    "Gli inseparabili II",
+    "L'inizio",
+    "Pets",
+    "Studente I",
+    "Studente II",
+    "Studente III",
     ],
     "Raffaele Morgillo": [
     "Bagnante",

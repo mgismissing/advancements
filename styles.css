@@ -104,6 +104,27 @@ a {
     color: #44ee44;
 }
 
+.unique {
+    display: inline-block;
+    font-weight: bold;
+    background: linear-gradient(-45deg, #44ee44, #ffffff, #44ee44);
+    background-size: 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: glint 2s infinite linear;
+}
+
+@keyframes glint {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+
 .search-container {
     display: flex;
 }
